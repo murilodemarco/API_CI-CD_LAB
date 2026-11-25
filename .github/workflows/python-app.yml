@@ -2,9 +2,9 @@ name: Python application
 
 on:
   push:
-    branches: [ "homologacao" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "homologacao" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -46,4 +46,25 @@ jobs:
         uses: docker/build-push-action@v7.4.0
         with:
           push: true
-          tags: murilodemarco/api_homologacao:latest
+          tags: murilodemarco/api_producao:latest
+          
+  deploy:
+    needs: Imagem
+    runs-on: ubuntu-latest
+
+    steps:
+      -  name: Deploy na EC2
+         uses: appleboy/ssh-action@v1.0.3
+         with:
+            host: 174.129.226.121
+            username: ubuntu
+            key: ${{secrets.CHAVE_PRODUCAO}}
+            script: |
+                echo "Acesso Liberado"
+                sudo docker pull murilodemarco/api_producao:latest
+                sudo docker stop api_producao 2>/dev/null || true
+                sudo docker rm api_producao 2>/dev/null || true
+
+                
+                #instalar nova versão
+                sudo docker run --name api_producao -d -p 80:8080 murilodemarco/api_producao:latest
