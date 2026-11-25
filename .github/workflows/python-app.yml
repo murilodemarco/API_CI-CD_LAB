@@ -67,4 +67,4 @@ jobs:
 
                 
                 #instalar nova versão
-                sudo docker run --name api_homologacao -d -p 80:80 murilodemarco/api_homologacao:latest
+                sudo docker run --name api_homologacao -d -p 80:8080 murilodemarco/api_homologacao:latest
