@@ -47,3 +47,24 @@ jobs:
         with:
           push: true
           tags: murilodemarco/api_homologacao:latest
+          
+  deploy:
+    needs: Imagem
+    runs-on: ubuntu-latest
+
+    steps:
+      -  name: Deploy na EC2
+         uses: appleboy/ssh-action@v1.0.3
+         with:
+            host: 52.5.242.42
+            username: ubuntu
+            key: ${{secrets.CHAVE}}
+            script: |
+                echo "Acesso Liberado"
+                sudo docker pull murilodemarco/api_homologacao:latest
+                sudo docker stop api_homologacao 2>/dev/null || true
+                sudo docker rm api_homologacao 2>/dev/null || true
+
+                
+                #instalar nova versão
+                sudo docker run --name api_homologacao -d -p 80:80 murilodemarco/api_homologacao:latest
